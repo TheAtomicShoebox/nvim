@@ -14,29 +14,29 @@
   end
 })]]
 
-vim.api.nvim_create_autocmd('ColorScheme', {
-  group = vim.api.nvim_create_augroup('wezterm_colorscheme', { clear = true }),
-  callback = function(args)
-    local colorschemes = {
-      ['tokyonight-day'] = 'Tokyo Night Day',
-      ['catpuccin-frappe'] = 'Catpuccin Frappe',
-      ['catpuccin-latte'] = 'Catpuccin Latte',
-      ['catpuccin-macchiato'] = 'Catpuccin Macchiato',
-      ['catpuccin-mocha'] = 'Catpuccin Mocha',
-      ['gruvbox'] = 'GruvboxDark',
-      ['kanagawa-dragon'] = 'Kanagawa Dragon (Gogh)',
-    }
-    local colorscheme = colorschemes[args.match]
-    if not colorscheme then
-      return
-    end
-    -- Write to a file
-    local filename = vim.fn.expand('$XDG_CONFIG_HOME/wezterm/colorscheme')
-    assert(type(filename) == 'string')
-    local file = io.open(filename, 'w')
-    assert(file)
-    file:write(colorscheme)
-    file:close()
-    Snacks.notifier.notify('Setting WezTerm color scheme to' .. colorscheme, 'info')
-  end,
-})
+-- vim.api.nvim_create_autocmd('ColorScheme', {
+--   group = vim.api.nvim_create_augroup('wezterm_colorscheme', { clear = true }),
+--   callback = function(args)
+--     local colorschemes = {
+--       ['tokyonight-day'] = 'Tokyo Night Day',
+--       ['catpuccin-frappe'] = 'Catpuccin Frappe',
+--       ['catpuccin-latte'] = 'Catpuccin Latte',
+--       ['catpuccin-macchiato'] = 'Catpuccin Macchiato',
+--       ['catpuccin-mocha'] = 'Catpuccin Mocha',
+--       ['gruvbox'] = 'GruvboxDark',
+--       ['kanagawa-dragon'] = 'Kanagawa Dragon (Gogh)',
+--     }
+--     local colorscheme = colorschemes[args.match]
+--     if not colorscheme then
+--       return
+--     end
+--     -- Write to a file
+--     local filename = vim.fn.expand('$XDG_CONFIG_HOME/wezterm/colorscheme')
+--     assert(type(filename) == 'string')
+--     local file = io.open(filename, 'w')
+--     assert(file)
+--     file:write(colorscheme)
+--     file:close()
+--     Snacks.notifier.notify('Setting WezTerm color scheme to' .. colorscheme, 'info')
+--   end,
+-- })

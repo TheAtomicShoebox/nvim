@@ -51,3 +51,5 @@ require("lazy").setup({
     },
   },
 })
+
+Snacks.notifier.notify(string.format("lazypath: [%s]", lazypath))
