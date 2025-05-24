@@ -8,6 +8,7 @@ return {
   ---@type RoslynNvimConfig
   opts = {
     config = {
+      cmd = {},
       settings = {
         ["csharp|background_analysis"] = {
           dotnet_analyzer_diagnostics_scope = "fullSolution",
