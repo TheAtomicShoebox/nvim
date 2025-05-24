@@ -3,6 +3,6 @@
 -- Add any additional keymaps here
 local map = LazyVim.safe_keymap_set
 
-map("n", "<leader>vs", function()
+map('n', '<leader>vs', function()
   vim.g.vscode = not vim.g.vscode
-end, { desc = "Toggle VS Code mode" })
+end, { desc = 'Toggle VS Code mode' })
