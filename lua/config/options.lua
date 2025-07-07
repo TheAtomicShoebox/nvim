@@ -3,4 +3,4 @@
 -- Add any additional options here
 vim.g.have_nerd_font = true
 
-LazyVim.terminal.setup('zsh')
+LazyVim.terminal.setup('pwsh')
