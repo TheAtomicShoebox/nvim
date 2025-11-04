@@ -3,4 +3,6 @@
 -- Add any additional options here
 vim.g.have_nerd_font = true
 
+vim.g.debug = false
+
 LazyVim.terminal.setup('pwsh')

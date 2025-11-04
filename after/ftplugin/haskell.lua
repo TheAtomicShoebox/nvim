@@ -26,31 +26,48 @@
 -- map('n', '<leader>rq', ht.repl.quit, opts)
 if not vim.g.vscode then
   local function find_stack_yaml()
-    local found = vim.fs.find({ 'stack.yaml' }, { upward = true, path = vim.loop.cwd() })
+    local found = vim.fs.find({ 'stack.yaml' }, { upward = true, path = vim.uv.cwd() })
     if found and #found > 0 then
       return found[1]
     end
     return nil
   end
 
+  ---@type utils.Util
+  local util = require('utils')
+
   local stack_yml = find_stack_yaml()
 
   local haskell_tools = vim.g.haskell_tools or {}
 
   ---@type haskell-tools.Opts
-  local opts = type(haskell_tools) == 'function' and haskell_tools() or haskell_tools
+  local tools_opts = type(haskell_tools) == 'function' and haskell_tools() or haskell_tools
+
+  local lsp_opts = util.ToTable(vim.lsp.config['hls'])
+
+  ---@type haskell-tools.Opts
+  local opts = tools_opts ~= nil and vim.tbl_deep_extend('keep', tools_opts, lsp_opts) or lsp_opts
+
+  util.Log(tools_opts.hls and 'found opts:\n' .. util.Serialize(tools_opts.hls) or 'tools_opts.hls is nil')
+  util.Log(lsp_opts and 'vim lsp config:\n' .. util.Serialize(lsp_opts) or 'vim.lsp.config["hls"] is nil')
+  util.Log(opts.hls and 'merged opts:\n' .. util.Serialize(opts.hls) or 'opts.hls is nil')
 
   ---@type ((fun():string[]) | string[])?
   local hls_cmd
   if stack_yml then
     hls_cmd = { 'stack', 'exec', '--', 'haskell-language-server-wrapper', '--lsp' }
+    util.Log('I got to place 1, hls_cmd was set. Found ' .. stack_yml)
   else
     hls_cmd = opts.hls.cmd
   end
+  util.Log('hls cmd: ' .. (hls_cmd ~= nil and util.Serialize(hls_cmd) or 'nil'))
+  opts.hls.cmd = hls_cmd
 
-  haskell_tools.hls.cmd = hls_cmd
-
-  if haskell_tools then
-    vim.g.haskell_tools = haskell_tools
+  if opts then
+    vim.g.haskell_tools = opts
+    util.Log('I got to place 2, vim.g.haskell_tools.hls.cmd was set to ' .. util.Serialize(vim.g.haskell_tools.hls.cmd))
+    util.Log('Final opts: ' .. util.Serialize(vim.g.haskell_tools))
   end
+
+  return vim.g.haskell_tools
 end
