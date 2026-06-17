@@ -33,7 +33,7 @@ if not vim.g.vscode then
     return nil
   end
 
-  ---@type utils.Util
+  ---@type utils
   local util = require('utils')
 
   local stack_yml = find_stack_yaml()
@@ -42,15 +42,18 @@ if not vim.g.vscode then
 
   ---@type haskell-tools.Opts
   local tools_opts = type(haskell_tools) == 'function' and haskell_tools() or haskell_tools
+  util.Log(tools_opts.hls and 'found opts:\n' .. util.Serialize(tools_opts.hls) or 'tools_opts.hls is nil')
 
   local lsp_opts = util.ToTable(vim.lsp.config['hls'])
+  util.Log(lsp_opts and 'vim lsp config:\n' .. util.Serialize(lsp_opts) or 'vim.lsp.config["hls"] is nil')
 
   ---@type haskell-tools.Opts
   local opts = tools_opts ~= nil and vim.tbl_deep_extend('keep', tools_opts, lsp_opts) or lsp_opts
+  util.Log(opts and 'merged opts:\n' .. util.Serialize(opts) or 'opts.hls is nil')
 
-  util.Log(tools_opts.hls and 'found opts:\n' .. util.Serialize(tools_opts.hls) or 'tools_opts.hls is nil')
-  util.Log(lsp_opts and 'vim lsp config:\n' .. util.Serialize(lsp_opts) or 'vim.lsp.config["hls"] is nil')
-  util.Log(opts.hls and 'merged opts:\n' .. util.Serialize(opts.hls) or 'opts.hls is nil')
+  -- util.Log(tools_opts.hls and 'found opts:\n' .. util.Serialize(tools_opts.hls) or 'tools_opts.hls is nil')
+  -- util.Log(lsp_opts and 'vim lsp config:\n' .. util.Serialize(lsp_opts) or 'vim.lsp.config["hls"] is nil')
+  -- util.Log(opts.hls and 'merged opts:\n' .. util.Serialize(opts.hls) or 'opts.hls is nil')
 
   ---@type ((fun():string[]) | string[])?
   local hls_cmd
@@ -61,7 +64,8 @@ if not vim.g.vscode then
     hls_cmd = opts.hls.cmd
   end
   util.Log('hls cmd: ' .. (hls_cmd ~= nil and util.Serialize(hls_cmd) or 'nil'))
-  opts.hls.cmd = hls_cmd
+  util.Log('opts: ' .. (opts.hls ~= nil and util.Serialize(opts.hls) or 'nil'))
+  --opts.hls.cmd = hls_cmd
 
   if opts then
     vim.g.haskell_tools = opts
