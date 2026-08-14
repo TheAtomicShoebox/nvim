@@ -48,7 +48,7 @@ function M.detectors.lsp(buf)
       roots[#roots + 1] = client.root_dir
     end
   end
-  return vim.tbl_filters(function(path)
+  return vim.tbl_filter(function(path)
     path = M.norm(path)
     return path and bufpath:find(path, 1, true) == 1
   end, roots)
@@ -56,7 +56,7 @@ end
 
 ---@param patterns string[]|string
 function M.detectors.pattern(buf, patterns)
-  patterns = type(patterns) == "string" and { patterns } or type(patterns) == "string[]" and patterns or { }
+  patterns = type(patterns) == "string" and { patterns } or patterns --[[@as string[] ]]
 
   local path = M.bufpath(buf) or vim.uv.cwd()
   ---@param name string
@@ -205,9 +205,26 @@ function M.git()
   return ret
 end
 
----@param opts? {hl_last?: string}
-function M.pretty_path(opts)
-  return ""
+---Buffer path relative to the project root (or cwd), shortened for the
+---statusline: keeps the first segment, an ellipsis, and the last two.
+function M.pretty_path()
+  local path = vim.api.nvim_buf_get_name(0)
+  if path == "" then
+    return ""
+  end
+  path = M.norm(path)
+  local root = M.get({ normalize = true })
+  local cwd = M.cwd()
+  if root and path:find(root, 1, true) == 1 then
+    path = path:sub(#root + 2)
+  elseif cwd ~= "" and path:find(cwd, 1, true) == 1 then
+    path = path:sub(#cwd + 2)
+  end
+  local parts = vim.split(path, "/")
+  if #parts > 4 then
+    parts = { parts[1], "…", parts[#parts - 1], parts[#parts] }
+  end
+  return table.concat(parts, "/")
 end
 
 return M
