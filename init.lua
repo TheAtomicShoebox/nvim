@@ -1,6 +1,6 @@
 local util = require("util")
 
-local gh = util.gh
+util.root.setup()
 
 vim.g.debug = true
 
@@ -30,109 +30,40 @@ vim.opt.signcolumn = "yes"
 vim.opt.showmatch = true
 vim.opt.showmode = false
 
-vim.keymap.set('n', '<ESC>', ':nohlsearch<CR>', { desc = "Clear search highlights" })
+vim.keymap.set("n", "<ESC>", ":nohlsearch<CR>", { desc = "Clear search highlights" })
 
-local augroup = vim.api.nvim_create_augroup("UserConfig", { clear = true })
+-- Format-on-save is handled by conform.nvim (bundles/lsp/conform.lua).
 
-vim.api.nvim_create_autocmd("BufWritePre", {
-  group = augroup,
-  pattern = {
-   "*.lua",
-   "*.py",
-   "*.go",
-   "*.js",
-   "*.jsx",
-   "*.ts",
-   "*.tsx",
-   "*.json",
-   "*.css",
-   "*.scss",
-   "*.html",
-   "*.sh",
-   "*.bash",
-   "*.zsh",
-   "*.c",
-   "*.cpp",
-   "*.h",
-   "*.hpp",
-  },
-  callback = function(args)
-    if vim.bo[args.buf].buftype ~= "" then
-      return
-    end
-    if not vim.bo[args.buf].modifiable then
-      return
-    end
-    if vim.api.nvim_buf_get_name(args.buf) == "" then
-      return
-    end
-
-    local has_efm = false
-
-    for _, c in ipairs(vim.lsp.get_clients({ bufnr = args.buf })) do
-      if c.name == "efm" then
-        has_efm = true
-        break
-      end
-    end
-    if not has_efm then
-      return
-    end
-
-    pcall(vim.lsp.buf.format, {
-      bufnr = args.buf,
-      timeout_ms = 2000,
-      filter = function(c)
-        return c.name == "efm"
-      end,
-    })
-  end,
-})
-
--- require('nvim-tree').setup({
---   view = { width = 35 },
---   filters = { dotfiles = false },
---   renderer = { group_empty = true },
--- })
--- vim.keymap.set('n', '<leader>e', function()
---   require('nvim-tree.api').tree.toggle()
--- end, { desc = 'Toggle NvimTree' })
-
-vim.api.nvim_set_hl(0, "NvimTreeNormalNC", { bg = "none" })
 vim.api.nvim_set_hl(0, "SignColumn", { bg = "none" })
-vim.api.nvim_set_hl(0, "NvimTreeSignColumn", { bg = "none" })
-vim.api.nvim_set_hl(0, "NvimTreeNormal", { bg = "none" })
-vim.api.nvim_set_hl(0, "NvimTreeWinSeparator", { fg = "#2a2a2a", bg = "none" })
-vim.api.nvim_set_hl(0, "NvimTreeEndOfBuffer", { bg = "none" })
 
 local diagnostic_signs = {
-	Error = "\u{f057} ",
-	Warn = "\u{f071} ",
-	Hint = "\u{ea61}",
-	Info = "\u{f05a}",
+  Error = "\u{f057} ",
+  Warn = "\u{f071} ",
+  Hint = "\u{ea61}",
+  Info = "\u{f05a}",
 }
 
 vim.diagnostic.config({
-	virtual_text = { prefix = "●", spacing = 4 },
-	signs = {
-		text = {
-			[vim.diagnostic.severity.ERROR] = diagnostic_signs.Error,
-			[vim.diagnostic.severity.WARN] = diagnostic_signs.Warn,
-			[vim.diagnostic.severity.INFO] = diagnostic_signs.Info,
-			[vim.diagnostic.severity.HINT] = diagnostic_signs.Hint,
-		},
-	},
-	underline = true,
-	update_in_insert = false,
-	severity_sort = true,
-	float = {
-		border = "rounded",
-		source = true,
-		header = "",
-		prefix = "",
-		focusable = false,
-		style = "minimal",
-	},
+  virtual_text = { prefix = "●", spacing = 4 },
+  signs = {
+    text = {
+      [vim.diagnostic.severity.ERROR] = diagnostic_signs.Error,
+      [vim.diagnostic.severity.WARN] = diagnostic_signs.Warn,
+      [vim.diagnostic.severity.INFO] = diagnostic_signs.Info,
+      [vim.diagnostic.severity.HINT] = diagnostic_signs.Hint,
+    },
+  },
+  underline = true,
+  update_in_insert = false,
+  severity_sort = true,
+  float = {
+    border = "rounded",
+    source = true,
+    header = "",
+    prefix = "",
+    focusable = false,
+    style = "minimal",
+  },
 })
 
 do
@@ -144,15 +75,21 @@ do
   end
 end
 
+vim.keymap.set("n", "<C-j>", "<C-w>j", { desc = "Go to Lower Window", remap = true })
+vim.keymap.set("n", "<C-h>", "<C-w>h", { desc = "Go to Left Window", remap = true })
+vim.keymap.set("n", "<C-k>", "<C-w>k", { desc = "Go to Upper Window", remap = true })
+vim.keymap.set("n", "<C-l>", "<C-w>l", { desc = "Go to Right Window", remap = true })
 
-vim.keymap.set('n', '<C-j>', '<C-w>j', { desc = "Go to Lower Window", remap = true })
-vim.keymap.set('n', '<C-h>', '<C-w>h', { desc = "Go to Left Window", remap = true })
-vim.keymap.set('n', '<C-k>', '<C-w>k', { desc = "Go to Upper Window", remap = true })
-vim.keymap.set('n', '<C-l>', '<C-w>l', { desc = "Go to Right Window", remap = true })
+vim.keymap.set("n", "<S-h>", "<cmd>bprevious<cr>", { desc = "Prev Buffer" })
+vim.keymap.set("n", "<S-l>", "<cmd>bnext<cr>", { desc = "Next Buffer" })
+vim.keymap.set("n", "[b", "<cmd>bprevious<cr>", { desc = "Prev Buffer" })
+vim.keymap.set("n", "]b", "<cmd>bnext<cr>", { desc = "Next Buffer" })
+vim.keymap.set("n", "<leader>bb", "<cmd>e #<cr>", { desc = "Switch to Other Buffer" })
+vim.keymap.set("n", "<leader>`", "<cmd>e #<cr>", { desc = "Switch to Other Buffer" })
 
-vim.keymap.set('n', '<S-h>', '<cmd>bprevious<cr>', { desc = "Prev Buffer" })
-vim.keymap.set('n', '<S-l>', '<cmd>bnext<cr>', { desc = "Next Buffer" })
-vim.keymap.set('n', '[b', '<cmd>bprevious<cr>', { desc = "Prev Buffer" })
-vim.keymap.set('n', ']b', '<cmd>bnext<cr>', { desc = "Next Buffer" })
-vim.keymap.set('n', '<leader>bb', '<cmd>e #<cr>', { desc = "Switch to Other Buffer" })
-vim.keymap.set('n', '<leader>`', '<cmd>e #<cr>', { desc = "Switch to Other Buffer" })
+vim.keymap.set("n", "<leader>qq", "<cmd>qa<cr>", { desc = "Quit All" })
+
+-- Discover lua/bundles/<name>/init.lua specs, run eager ones, merge the
+-- rest onto shared autocmds. Deps are module tables; ensure() is a
+-- single-pass post-order walk (see lua/bundles/init.lua).
+require("bundles").bootstrap()
