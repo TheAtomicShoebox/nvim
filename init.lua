@@ -34,6 +34,13 @@ vim.keymap.set("n", "<ESC>", ":nohlsearch<CR>", { desc = "Clear search highlight
 
 -- Format-on-save is handled by conform.nvim (bundles/lsp/conform.lua).
 
+-- Re-apply after colorscheme so the transparent sign column survives theme load.
+vim.api.nvim_create_autocmd("ColorScheme", {
+  group = vim.api.nvim_create_augroup("UserSignColumn", { clear = true }),
+  callback = function()
+    vim.api.nvim_set_hl(0, "SignColumn", { bg = "none" })
+  end,
+})
 vim.api.nvim_set_hl(0, "SignColumn", { bg = "none" })
 
 local diagnostic_signs = {

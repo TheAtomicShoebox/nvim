@@ -11,6 +11,7 @@ function M.setup()
   require("bundles.tools.trouble")
   require("bundles.tools.todo-comments")
   require("bundles.tools.picker")
+  require("bundles.tools.pack")
   require("bundles.tools.persistence")
 end
 

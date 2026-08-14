@@ -67,17 +67,19 @@ local function diagnostic_goto(next, severity)
   end
 end
 
-util.pack.keys({
-  { "<leader>cd", vim.diagnostic.open_float, desc = "Line Diagnostics" },
-  { "]d", diagnostic_goto(true), desc = "Next Diagnostic" },
-  { "[d", diagnostic_goto(false), desc = "Prev Diagnostic" },
-  { "]e", diagnostic_goto(true, "ERROR"), desc = "Next Error" },
-  { "[e", diagnostic_goto(false, "ERROR"), desc = "Prev Error" },
-  { "]w", diagnostic_goto(true, "WARN"), desc = "Next Warning" },
-  { "[w", diagnostic_goto(false, "WARN"), desc = "Prev Warning" },
-  { "<leader>xl", function() vim.diagnostic.setloclist({ open = true }) end, desc = "Diagnostics Location List" },
-  { "<leader>xq", function() vim.diagnostic.setqflist({ open = true }) end, desc = "Diagnostics Quickfix List" },
-})
+vim.keymap.set("n", "<leader>cd", vim.diagnostic.open_float, { desc = "Line Diagnostics" })
+vim.keymap.set("n", "]d", diagnostic_goto(true), { desc = "Next Diagnostic" })
+vim.keymap.set("n", "[d", diagnostic_goto(false), { desc = "Prev Diagnostic" })
+vim.keymap.set("n", "]e", diagnostic_goto(true, "ERROR"), { desc = "Next Error" })
+vim.keymap.set("n", "[e", diagnostic_goto(false, "ERROR"), { desc = "Prev Error" })
+vim.keymap.set("n", "]w", diagnostic_goto(true, "WARN"), { desc = "Next Warning" })
+vim.keymap.set("n", "[w", diagnostic_goto(false, "WARN"), { desc = "Prev Warning" })
+vim.keymap.set("n", "<leader>xl", function()
+  vim.diagnostic.setloclist({ open = true })
+end, { desc = "Diagnostics Location List" })
+vim.keymap.set("n", "<leader>xq", function()
+  vim.diagnostic.setqflist({ open = true })
+end, { desc = "Diagnostics Quickfix List" })
 
 local augroup = vim.api.nvim_create_augroup("UserLsp", { clear = true })
 vim.api.nvim_create_autocmd('LspAttach', { group = augroup, callback = lsp_on_attach })

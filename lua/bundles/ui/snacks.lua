@@ -37,7 +37,8 @@ require("snacks").setup({
             { "⚡ Neovim with ", hl = "footer" },
             -- info = false: the default runs git queries per plugin (~100ms)
             { tostring(#vim.pack.get(nil, { info = false })), hl = "special" },
-            { " plugins", hl = "footer" },
+            { " plugins  ·  ", hl = "footer" },
+            { vim.g.user_colorscheme or vim.g.colors_name or "?", hl = "special" },
           },
         }
       end,
@@ -195,97 +196,59 @@ Snacks.toggle.animate():map("<leader>ua")
 Snacks.toggle.profiler():map("<leader>dpp")
 Snacks.toggle.profiler_highlights():map("<leader>dph")
 
-util.pack.keys({
-  -- snacks explorer
-  {
-    "<leader>fE",
-    function()
-      Snacks.explorer()
+vim.keymap.set("n", "<leader>fE", function()
+  Snacks.explorer()
+end, { desc = "Explorer Snacks (cwd)" })
+vim.keymap.set("n", "<leader>fe", function()
+  Snacks.explorer({ cwd = root() })
+end, { desc = "Explorer Snacks (root dir)" })
+vim.keymap.set("n", "<leader>e", "<leader>fe", { desc = "Explorer Snacks (root dir)", remap = true })
+vim.keymap.set("n", "<leader>E", "<leader>fE", { desc = "Explorer Snacks (cwd)", remap = true })
+vim.keymap.set("n", "<leader>bd", function()
+  Snacks.bufdelete()
+end, { desc = "Delete Buffer" })
+vim.keymap.set("n", "<leader>bo", function()
+  Snacks.bufdelete.other()
+end, { desc = "Delete Other Buffers" })
+vim.keymap.set("n", "<leader>bi", function()
+  Snacks.bufdelete.invisible()
+end, { desc = "Delete Invisible Buffers" })
+vim.keymap.set("n", "<leader>bD", "<cmd>:bd<cr>", { desc = "Delete Buffer and Window" })
+vim.keymap.set("n", "<leader>.", function()
+  Snacks.scratch()
+end, { desc = "Toggle Scratch Buffer" })
+vim.keymap.set("n", "<leader>S", function()
+  Snacks.scratch.select()
+end, { desc = "Select Scratch Buffer" })
+vim.keymap.set("n", "<leader>ft", function()
+  Snacks.terminal(nil, { cwd = root() })
+end, { desc = "Terminal (root)" })
+vim.keymap.set("n", "<leader>fT", function()
+  Snacks.terminal()
+end, { desc = "Terminal (cwd)" })
+vim.keymap.set("n", "<c-/>", function()
+  Snacks.terminal(nil, { cwd = root() })
+end, { desc = "Terminal (root)" })
+vim.keymap.set("n", "<c-_>", function()
+  Snacks.terminal(nil, { cwd = root() })
+end, { desc = "which_key_ignore" })
+vim.keymap.set("n", "<leader>un", function()
+  Snacks.notifier.hide()
+end, { desc = "Dismiss All Notifications" })
+vim.keymap.set("n", "<leader>n", function()
+  Snacks.notifier.show_history()
+end, { desc = "Notification History" })
+vim.keymap.set("n", "<leader>uC", function()
+  Snacks.picker.colorschemes({
+    confirm = function(picker, item)
+      picker:close()
+      if not item then
+        return
+      end
+      picker.preview.state.colorscheme = nil
+      vim.schedule(function()
+        require("bundles.ui.colorscheme").choose(item.text)
+      end)
     end,
-    desc = "Explorer Snacks (cwd)",
-  },
-  {
-    "<leader>fe",
-    function()
-      Snacks.explorer({ cwd = root() })
-    end,
-    desc = "Explorer Snacks (root dir)",
-  },
-  { "<leader>e", "<leader>fe", desc = "Explorer Snacks (root dir)", remap = true },
-  { "<leader>E", "<leader>fE", desc = "Explorer Snacks (cwd)", remap = true },
-  -- snacks buffers
-  {
-    "<leader>bd",
-    function()
-      Snacks.bufdelete()
-    end,
-    desc = "Delete Buffer",
-  },
-  {
-    "<leader>bo",
-    function()
-      Snacks.bufdelete.other()
-    end,
-    desc = "Delete Other Buffers",
-  },
-  {
-    "<leader>bi",
-    function()
-      Snacks.bufdelete.invisible()
-    end,
-    desc = "Delete Invisible Buffers",
-  },
-  { "<leader>bD", "<cmd>:bd<cr>", desc = "Delete Buffer and Window" },
-  -- snacks scratch buffers
-  {
-    "<leader>.",
-    function()
-      Snacks.scratch()
-    end,
-    desc = "Toggle Scratch Buffer",
-  },
-  {
-    "<leader>S",
-    function()
-      Snacks.scratch.select()
-    end,
-    desc = "Select Scratch Buffer",
-  },
-  -- snacks terminal
-  {
-    "<leader>ft",
-    function()
-      Snacks.terminal(nil, { cwd = root() })
-    end,
-    desc = "Terminal (root)",
-  },
-  {
-    "<leader>fT",
-    function()
-      Snacks.terminal()
-    end,
-    desc = "Terminal (cwd)",
-  },
-  {
-    "<c-/>",
-    function()
-      Snacks.terminal(nil, { cwd = root() })
-    end,
-    desc = "Terminal (root)",
-  },
-  {
-    "<c-_>",
-    function()
-      Snacks.terminal(nil, { cwd = root() })
-    end,
-    desc = "which_key_ignore",
-  },
-  -- snacks notifier
-  {
-    "<leader>un",
-    function()
-      Snacks.notifier.hide()
-    end,
-    desc = "Dismiss All Notifications",
-  },
-})
+  })
+end, { desc = "Colorscheme with Preview" })

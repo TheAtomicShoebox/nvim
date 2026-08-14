@@ -17,11 +17,19 @@ require("mini.diff").setup({
 require("mini.git").setup({})
 
 local MiniDiff = require("mini.diff")
-util.pack.keys({
-  { "]h", function() MiniDiff.goto_hunk("next") end, desc = "Next git hunk" },
-  { "[h", function() MiniDiff.goto_hunk("prev") end, desc = "Prev git hunk" },
-  -- <leader>gh = "hunks" group (see which-key spec in bundles/ui)
-  { "<leader>ghs", function() return MiniDiff.operator("apply") end, expr = true, desc = "Stage hunk (operator)" },
-  { "<leader>ghp", function() MiniDiff.toggle_overlay(vim.api.nvim_get_current_buf()) end, desc = "Preview diff overlay" },
-  { "<leader>ghb", function() require("mini.git").show_at_cursor() end, desc = "Git blame/show" },
-})
+vim.keymap.set("n", "]h", function()
+  MiniDiff.goto_hunk("next")
+end, { desc = "Next git hunk" })
+vim.keymap.set("n", "[h", function()
+  MiniDiff.goto_hunk("prev")
+end, { desc = "Prev git hunk" })
+-- <leader>gh = "hunks" group (see which-key spec in bundles/ui)
+vim.keymap.set("n", "<leader>ghs", function()
+  return MiniDiff.operator("apply")
+end, { expr = true, desc = "Stage hunk (operator)" })
+vim.keymap.set("n", "<leader>ghp", function()
+  MiniDiff.toggle_overlay(vim.api.nvim_get_current_buf())
+end, { desc = "Preview diff overlay" })
+vim.keymap.set("n", "<leader>ghb", function()
+  require("mini.git").show_at_cursor()
+end, { desc = "Git blame/show" })

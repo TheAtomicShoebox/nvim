@@ -38,11 +38,6 @@ require("conform").setup({
   end,
 })
 
-util.pack.keys({
-  {
-    "<leader>cf",
-    function() require("conform").format() end,
-    mode = { "n", "v" },
-    desc = "Format buffer/range",
-  },
-})
+vim.keymap.set({ "n", "v" }, "<leader>cf", function()
+  require("conform").format()
+end, { desc = "Format buffer/range" })

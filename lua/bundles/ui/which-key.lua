@@ -15,9 +15,11 @@ require("which-key").setup({
       { "<leader>dp", group = "profiler" },
       { "<leader>f", group = "file/find" },
       { "<leader>g", group = "git" },
+      { "<leader>p", group = "pack" },
       { "<leader>gh", group = "hunks" },
       { "<leader>q", group = "quit/session" },
       { "<leader>s", group = "search" },
+      { "<leader>sn", group = "noice" },
       { "<leader>u", group = "ui" },
       { "<leader>x", group = "diagnostics/quickfix" },
       { "[", group = "prev" },
@@ -46,7 +48,9 @@ require("which-key").setup({
   },
 })
 
-util.pack.keys({
-  { "<leader>?", function() require("which-key").show({ global = false }) end, desc = "Buffer Keymaps (which-key)" },
-  { "<c-w><space>", function() require("which-key").show({ keys = "<c-w>", loop = true }) end, desc = "Window Hydra Mode (which-key)" },
-})
+vim.keymap.set("n", "<leader>?", function()
+  require("which-key").show({ global = false })
+end, { desc = "Buffer Keymaps (which-key)" })
+vim.keymap.set("n", "<c-w><space>", function()
+  require("which-key").show({ keys = "<c-w>", loop = true })
+end, { desc = "Window Hydra Mode (which-key)" })

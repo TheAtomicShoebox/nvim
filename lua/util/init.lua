@@ -21,4 +21,15 @@ function M.gh(path)
   return 'https://github.com/' .. path
 end
 
+---True for `nvim --headless` and `nvim -es` (silent ex). Those sessions
+---never get a UI, so UI plugins must not hijack messages / `vim.notify`.
+function M.headless()
+  for _, arg in ipairs(vim.v.argv) do
+    if arg == "--headless" or arg == "-es" then
+      return true
+    end
+  end
+  return false
+end
+
 return M

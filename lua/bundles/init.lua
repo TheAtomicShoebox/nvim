@@ -217,4 +217,16 @@ function M.loaded()
   return names
 end
 
+---Force-load every discovered bundle (and their deps). Used by :PackClean
+---so deferred plugins (blink, mason, …) count as active before deciding
+---what is unused.
+function M.ensure_all()
+  if #discovered == 0 then
+    error("bundles.bootstrap() has not run")
+  end
+  for _, bundle in ipairs(discovered) do
+    ensure(bundle)
+  end
+end
+
 return M

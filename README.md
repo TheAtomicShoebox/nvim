@@ -11,10 +11,9 @@ Design choices:
   configured with `require(...).setup({...})`. This gives full lua_ls typing on
   every opts table (the setup function's own annotations flow into the literal)
   with no wrapper indirection.
-- **Thin helpers only** (`lua/util/pack.lua`): `util.pack.keys()` applies
-  lazy.nvim-style `keys = {...}` tables (so LazyVim snippets can be pasted
-  nearly verbatim), and `util.pack.build()` registers a command to run when
-  vim.pack installs/updates a plugin (lazy's `build`).
+- **Thin helpers only** (`lua/util/pack.lua`): `util.pack.build()` registers
+  a command to run when vim.pack installs/updates a plugin (lazy's `build`).
+  Keymaps are plain `vim.keymap.set`.
 - **Bundles.** Config files live under `lua/bundles/<name>/`. Each folder’s
   `init.lua` returns a spec: `load` (eager or an autocmd), `deps()` (other
   bundle **modules**, not names), and `setup()` (the `vim.pack.add` /
@@ -22,13 +21,14 @@ Design choices:
   which discovers every spec, runs eager bundles, and merges the rest onto
   shared autocmds. `ensure()` is a single-pass post-order walk: a dependency
   is always set up before its consumer, and `setup()` runs at most once.
-  Bundles: `ui` (eager: snacks, which-key, bufferline, lualine, mini
-  icons/notify), `editing` (eager: mini modules, flash), `syntax` (FileType:
-  treesitter), `lsp` (FileType, depends on completion: mason, lspconfig,
+  Bundles: `ui` (eager: colorschemes, snacks, which-key, bufferline, lualine, mini
+  icons, noice), `editing` (VimEnter: mini modules, flash — not InsertEnter,
+  those keys are normal-mode first), `syntax` (FileType: treesitter), `lsp`
+  (FileType, depends on completion: mason, lspconfig,
   lazydev, conform), `completion` (InsertEnter, also pulled by lsp: blink,
   LuaSnip), `git` (VimEnter, depends on ui: mini.diff/git, snacks git
   keymaps), `tools` (VimEnter, depends on ui: trouble, todo-comments,
-  picker, persistence).
+  picker, pack UI, persistence).
 - **No load-order dependencies between sibling files.** Each file
   `vim.pack.add`s what it needs (duplicate adds are supported no-ops) and
   owns what it exports: blink.lua advertises LSP capabilities
@@ -51,9 +51,20 @@ Design choices:
 
 - Plugins install automatically at startup via `vim.pack.add()` in each
   bundle file.
-- Update everything with `:lua vim.pack.update()` (review the diff buffer it
-  opens), remove a plugin by deleting its `add` call and running
-  `:lua vim.pack.del({ "name" })`.
+- UI: `<leader>p` or `:Pack` is a short operations menu (update, status,
+  clean, lockfile, sync). Letter keys in the list match the action
+  (`u`/`s`/`c`/`l`/`S`); the same actions are also `<leader>pu` / `ps` /
+  `pc` / `pl` / `pS`. `vim.pack` still owns the review buffers.
+- Update: `:PackUpdate` (review the diff tab, `:write` to confirm; bang
+  applies without review). Browse without fetching: `:PackStatus`.
+  Align disk to the lockfile (after pulling this config on another
+  machine): `:PackSync`.
+- Remove unused plugins: delete the `add` call, restart, `:PackClean`
+  (loads every bundle first so deferred plugins like blink/mason are not
+  treated as unused). Or `:lua vim.pack.del({ "name" })`.
+- Lockfile is `nvim-pack-lock.json` in this directory (`:PackLock` opens
+  it). Treat it as part of the config (VCS) so other machines install at
+  the same revisions.
 - `nvim-treesitter` is pinned to its `main` branch; `util.pack.build` runs
   `:TSUpdate` for it after updates.
 
@@ -90,6 +101,7 @@ cwd). `:Root` shows the detection result.
 | `<leader>fx` / `fX` | Diagnostics (buffer / workspace) |
 | `<leader>:` | Command history |
 | `<leader>sk` / `sr` / `su` / `sn` | Keymaps / resume picker / undo tree / notifications |
+| `<leader>p` | vim.pack operations (also `pu`/`ps`/`pc`/`pl`/`pS`) |
 | `<leader>e` / `fe` | Explorer (root) |
 | `<leader>E` / `fE` | Explorer (cwd) |
 
@@ -200,9 +212,12 @@ in cwd (snacks terminal; same key toggles it closed).
 ### Toggles (`<leader>u`, state shown in which-key)
 
 `uf` autoformat · `us` spelling · `uw` wrap · `ul`/`uL` line/relative numbers ·
-`ud` diagnostics · `uc` conceal · `uT` treesitter highlight · `ub` dark/light
-background · `uh` inlay hints · `ug` indent guides · `uD` dim · `uz`/`uZ`
-zen/zoom · `uS` smooth scroll · `ua` animations · `un` dismiss notifications.
+`ud` diagnostics · `uc` conceal · `uC` colorscheme picker · `uR` random
+colorscheme · `uT` treesitter highlight · `ub` dark/light background · `uh`
+inlay hints · `ug` indent guides
+· `uD` dim · `uz`/`uZ` zen/zoom · `uS` smooth scroll · `ua` animations · `un`
+dismiss notifications · `<leader>n` notification history. Noice: `<leader>snh`
+history · `sna` all · `snl` last · `snt` picker · `snd` dismiss.
 Profiler: `<leader>dpp` toggle, `<leader>dph` highlights.
 
 ### Motions (flash.nvim)
@@ -218,7 +233,7 @@ replace-char is untouched (flash only claims it after an operator), and `s`
 
 mini.nvim is one plugin, but its modules are set up per bundle:
 `bundles/editing/mini.lua` (below), `bundles/git/mini-git.lua` (diff/git,
-see the Git section) and `bundles/ui/` (icons + notify).
+see the Git section) and `bundles/ui/` (icons).
 
 - **mini.ai** — better `a`/`i` textobjects (`vaf` function, `via` argument, ...)
 - **mini.surround** — LazyVim-style `gs*`: `gsa` add, `gsd` delete, `gsr`
@@ -226,15 +241,27 @@ see the Git section) and `bundles/ui/` (icons + notify).
 - **mini.comment** — `gcc`, `gc` + motion
 - **mini.move** — `<M-h/j/k/l>` move line/selection
 - **mini.pairs**, **mini.trailspace**, **mini.cursorword**
-- **mini.icons** (in ui.lua; also mocks nvim-web-devicons for
-  bufferline/lualine), **mini.notify** (in ui.lua)
+- **mini.icons** (in `bundles/ui/bufferline.lua`; also mocks nvim-web-devicons for
+  bufferline/lualine)
 
 ### UI
 
-- **snacks**: statuscolumn, indent guides + scope, notifier, input, words
-  (LSP reference highlights), quickfile, bigfile, image, dim, zen, scroll
-  animations, explorer (netrw replaced), dashboard (custom keys/footer; the
-  stock session key and `startup` section need lazy.nvim)
+- **colorschemes**: a dark pool (Tokyo Night, Catppuccin, Kanagawa, Rosé Pine,
+  Nightfox, Gruvbox Material, Everforest, One Dark, GitHub, Cyberdream,
+  Oxocarbon, VS Code, Nordic, Melange, Moonfly, plus stock schemes like
+  habamax/retrobox). A random one is applied at startup; the name is
+  announced via `vim.notify` and shown on the dashboard footer.
+  `<leader>uC` live-previews any installed scheme; `<leader>uR` re-rolls.
+- **snacks**: statuscolumn, indent guides + scope, notifier (`vim.notify`
+  popups + `<leader>n` history), input, words (LSP reference highlights),
+  quickfile, bigfile, image, dim, zen, scroll animations, explorer (netrw
+  replaced), dashboard (custom keys/footer; the stock session key and
+  `startup` section need lazy.nvim)
+- **noice**: cmdline / messages / LSP hover UI; routes `vim.notify` into
+  snacks.notifier. Skipped under `nvim --headless` / `nvim -es`
+  (`util.headless()`); otherwise waits for `UIEnter` so `--embed` without a
+  UI does not steal messages. History: `<leader>snh` / `sna` / `snl` /
+  `snt`, dismiss `<leader>snd` (also `<leader>un`)
 - **bufferline**: tabs for named buffers only, explorer offset, LSP
   diagnostics in tabs
 - **lualine**: global statusline — mode, branch, root-relative path

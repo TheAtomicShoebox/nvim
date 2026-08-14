@@ -4,10 +4,18 @@ vim.pack.add({ util.gh('folke/flash.nvim') })
 
 require("flash").setup({})
 
-util.pack.keys({
-  { "s", function() require("flash").jump() end, mode = { "n", "x", "o" }, desc = "Flash" },
-  { "S", function() require("flash").treesitter() end, mode = { "n", "x", "o" }, desc = "Flash Treesitter" },
-  { "r", function() require("flash").remote() end, mode = "o", desc = "Remote Flash" },
-  { "R", function() require("flash").treesitter_search() end, mode = { "o", "x" }, desc = "Treesitter Search" },
-  { "<c-s>", function() require("flash").toggle() end, mode = "c", desc = "Toggle Flash Search" },
-})
+vim.keymap.set({ "n", "x", "o" }, "s", function()
+  require("flash").jump()
+end, { desc = "Flash" })
+vim.keymap.set({ "n", "x", "o" }, "S", function()
+  require("flash").treesitter()
+end, { desc = "Flash Treesitter" })
+vim.keymap.set("o", "r", function()
+  require("flash").remote()
+end, { desc = "Remote Flash" })
+vim.keymap.set({ "o", "x" }, "R", function()
+  require("flash").treesitter_search()
+end, { desc = "Treesitter Search" })
+vim.keymap.set("c", "<c-s>", function()
+  require("flash").toggle()
+end, { desc = "Toggle Flash Search" })

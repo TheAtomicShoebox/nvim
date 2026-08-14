@@ -12,7 +12,24 @@ local expected_plugins = {
   "which-key.nvim",
   "bufferline.nvim",
   "lualine.nvim",
+  "tokyonight.nvim",
+  "catppuccin.nvim",
+  "kanagawa.nvim",
+  "rose-pine",
+  "nightfox.nvim",
+  "gruvbox-material",
+  "everforest",
+  "onedark.nvim",
+  "github-nvim-theme",
+  "cyberdream.nvim",
+  "oxocarbon.nvim",
+  "vscode.nvim",
+  "nordic.nvim",
+  "melange-nvim",
+  "vim-moonfly-colors",
   "mini.nvim",
+  "nui.nvim",
+  "noice.nvim",
   "mason.nvim",
   "mason-lspconfig.nvim",
   "conform.nvim",
@@ -30,22 +47,22 @@ local expected_plugins = {
 }
 
 ---External executables the config relies on.
+---`bundle` = mason-owned tools that are only on PATH after that bundle's setup.
 local expected_tools = {
   { cmd = "git", required = true, why = "vim.pack and mini.git" },
   { cmd = "rg", required = true, why = "snacks picker grep" },
   { cmd = "fd", required = false, why = "faster file finding in snacks picker" },
-  { cmd = "lua-language-server", required = false, why = "vim.lsp.enable('lua_ls')" },
-  { cmd = "stylua", required = false, why = "lua formatting via conform" },
-  { cmd = "shfmt", required = false, why = "shell formatting via conform" },
+  { cmd = "lua-language-server", required = false, why = "vim.lsp.enable('lua_ls')", bundle = "lsp" },
+  { cmd = "stylua", required = false, why = "lua formatting via conform", bundle = "lsp" },
+  { cmd = "shfmt", required = false, why = "shell formatting via conform", bundle = "lsp" },
   { cmd = "lazygit", required = false, why = "<leader>gg / <leader>gG via Snacks.lazygit" },
-  -- LSP servers (mason ensure_installed, see bundles/lsp/mason.lua)
-  { cmd = "bash-language-server", required = false, why = "bashls" },
-  { cmd = "gopls", required = false, why = "gopls" },
-  { cmd = "clangd", required = false, why = "clangd" },
-  { cmd = "vtsls", required = false, why = "vtsls (TypeScript/JavaScript)" },
-  { cmd = "vscode-html-language-server", required = false, why = "html" },
-  { cmd = "vscode-css-language-server", required = false, why = "cssls" },
-  { cmd = "vscode-json-language-server", required = false, why = "jsonls" },
+  { cmd = "bash-language-server", required = false, why = "bashls", bundle = "lsp" },
+  { cmd = "gopls", required = false, why = "gopls", bundle = "lsp" },
+  { cmd = "clangd", required = false, why = "clangd", bundle = "lsp" },
+  { cmd = "vtsls", required = false, why = "vtsls (TypeScript/JavaScript)", bundle = "lsp" },
+  { cmd = "vscode-html-language-server", required = false, why = "html", bundle = "lsp" },
+  { cmd = "vscode-css-language-server", required = false, why = "cssls", bundle = "lsp" },
+  { cmd = "vscode-json-language-server", required = false, why = "jsonls", bundle = "lsp" },
 }
 
 ---Normal-mode keymaps that should exist after startup (leader-based only,
@@ -56,6 +73,9 @@ local expected_maps = {
   "<leader>fe",
   "<leader>?",
   "<leader>bd",
+  "<leader>n",
+  "<leader>uC",
+  "<leader>uR",
   "<leader>cf",
   "<leader>xl",
   "<leader>ghs",
@@ -64,12 +84,13 @@ local expected_maps = {
   "]d",
   "]t",
   "<leader>st",
+  "<leader>p",
 }
 
 ---Treesitter parsers that bundles/syntax/treesitter.lua ensures.
 local expected_parsers = { "lua", "vim", "vimdoc", "markdown" }
 
----Bundles bootstrap() is expected to discover (lua/bundles/<name>/init.lua).
+local expected_commands = { "Pack", "PackUpdate", "PackStatus", "PackClean", "PackLock", "PackSync" }
 local expected_bundles = { "ui", "editing", "syntax", "lsp", "completion", "git", "tools" }
 
 ---Owning bundle for each plugin. If that bundle has not been setup() yet,
@@ -79,7 +100,24 @@ local plugin_bundle = {
   ["which-key.nvim"] = "ui",
   ["bufferline.nvim"] = "ui",
   ["lualine.nvim"] = "ui",
+  ["tokyonight.nvim"] = "ui",
+  ["catppuccin.nvim"] = "ui",
+  ["kanagawa.nvim"] = "ui",
+  ["rose-pine"] = "ui",
+  ["nightfox.nvim"] = "ui",
+  ["gruvbox-material"] = "ui",
+  ["everforest"] = "ui",
+  ["onedark.nvim"] = "ui",
+  ["github-nvim-theme"] = "ui",
+  ["cyberdream.nvim"] = "ui",
+  ["oxocarbon.nvim"] = "ui",
+  ["vscode.nvim"] = "ui",
+  ["nordic.nvim"] = "ui",
+  ["melange-nvim"] = "ui",
+  ["vim-moonfly-colors"] = "ui",
   ["mini.nvim"] = "ui",
+  ["nui.nvim"] = "ui",
+  ["noice.nvim"] = "ui",
   ["flash.nvim"] = "editing",
   ["mason.nvim"] = "lsp",
   ["mason-lspconfig.nvim"] = "lsp",
@@ -104,6 +142,9 @@ local map_bundle = {
   ["<leader>fe"] = "ui",
   ["<leader>?"] = "ui",
   ["<leader>bd"] = "ui",
+  ["<leader>n"] = "ui",
+  ["<leader>uC"] = "ui",
+  ["<leader>uR"] = "ui",
   ["<leader>cf"] = "lsp",
   ["<leader>xl"] = "lsp",
   ["<leader>ghs"] = "git",
@@ -111,6 +152,7 @@ local map_bundle = {
   ["]d"] = "lsp",
   ["]t"] = "tools",
   ["<leader>st"] = "tools",
+  ["<leader>p"] = "tools",
 }
 
 ---@param load Bundle.Load
@@ -181,15 +223,20 @@ local function check_plugins(by_name)
   end
 end
 
-local function check_tools()
+local function check_tools(by_name)
   health.start("External tools")
   for _, tool in ipairs(expected_tools) do
     if vim.fn.executable(tool.cmd) == 1 then
       health.ok(("`%s` found (%s)"):format(tool.cmd, tool.why))
-    elseif tool.required then
-      health.error(("`%s` not found: %s"):format(tool.cmd, tool.why))
     else
-      health.warn(("`%s` not found: %s"):format(tool.cmd, tool.why))
+      local deferred = tool.bundle ~= nil and by_name[tool.bundle] ~= nil and not by_name[tool.bundle].loaded
+      if deferred then
+        health.info(("`%s` not on PATH yet (deferred with `%s`: %s)"):format(tool.cmd, tool.bundle, tool.why))
+      elseif tool.required then
+        health.error(("`%s` not found: %s"):format(tool.cmd, tool.why))
+      else
+        health.warn(("`%s` not found: %s"):format(tool.cmd, tool.why))
+      end
     end
   end
 end
@@ -230,6 +277,13 @@ local function check_globals()
   else
     health.error("`util.root()` failed: " .. tostring(root))
   end
+  for _, cmd in ipairs(expected_commands) do
+    if vim.fn.exists(":" .. cmd) == 2 then
+      health.ok(("`:%s` is defined"):format(cmd))
+    else
+      health.error(("`:%s` is not defined"):format(cmd))
+    end
+  end
 end
 
 local function check_treesitter(by_name)
@@ -263,7 +317,7 @@ function M.check()
 
   local by_name = check_bundles()
   check_plugins(by_name)
-  check_tools()
+  check_tools(by_name)
   check_keymaps(by_name)
   check_globals()
   check_treesitter(by_name)
