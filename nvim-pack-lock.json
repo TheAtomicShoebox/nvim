@@ -48,6 +48,11 @@
       "rev": "11d779b26a9ab2b3db8c22c6ac9fb6e8ed4fea79",
       "src": "https://github.com/sainnhe/gruvbox-material"
     },
+    "haskell-tools.nvim": {
+      "rev": "556c28dcfd7479270d557e3e73356411058005ea",
+      "src": "https://github.com/mrcjkb/haskell-tools.nvim",
+      "version": "10.0.0 - 11.0.0"
+    },
     "kanagawa.nvim": {
       "rev": "bb85e4bfc8d89b0e62c8fa53ccdd13d12e2f77b3",
       "src": "https://github.com/rebelot/kanagawa.nvim"

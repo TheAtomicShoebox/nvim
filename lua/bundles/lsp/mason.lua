@@ -21,4 +21,11 @@ require("mason-lspconfig").setup({
     "cssls",
     "jsonls",
   },
+  -- Mason's HLS bindist is GHC-patch-specific (currently 9.10.3) and
+  -- automatic_enable would start lspconfig's `hls` next to haskell-tools,
+  -- which is what produces "ghcide compiled against X but using Y".
+  automatic_enable = {
+    exclude = { "hls" },
+  },
 })
+vim.lsp.enable("hls", false)

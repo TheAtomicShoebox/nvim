@@ -15,6 +15,7 @@ require("which-key").setup({
       { "<leader>dp", group = "profiler" },
       { "<leader>f", group = "file/find" },
       { "<leader>g", group = "git" },
+      { "<leader>h", group = "haskell" },
       { "<leader>p", group = "pack" },
       { "<leader>gh", group = "hunks" },
       { "<leader>q", group = "quit/session" },

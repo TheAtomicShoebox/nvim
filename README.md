@@ -28,7 +28,8 @@ Design choices:
   lazydev, conform), `completion` (InsertEnter, also pulled by lsp: blink,
   LuaSnip), `git` (VimEnter, depends on ui: mini.diff/git, snacks git
   keymaps), `tools` (VimEnter, depends on ui: trouble, todo-comments,
-  picker, pack UI, persistence).
+  picker, pack UI, persistence), `haskell` (FileType haskell/cabal,
+  depends on lsp: haskell-tools.nvim, not mason HLS).
 - **No load-order dependencies between sibling files.** Each file
   `vim.pack.add`s what it needs (duplicate adds are supported no-ops) and
   owns what it exports: blink.lua advertises LSP capabilities
@@ -110,10 +111,12 @@ Inside pickers: `<S-h>` toggle hidden, `<S-i>` toggle ignored.
 ### LSP
 
 Servers are mason-managed (`bundles/lsp/mason.lua`): mason-lspconfig enables every
-installed server automatically (configs from nvim-lspconfig, overrides in
-`after/lsp/<server>.lua`), and ensure-installs `lua_ls`, `bashls`, `gopls`,
-`clangd`, `vtsls`, `html`, `cssls`, `jsonls`. Install more via `:Mason` —
-no config needed. Node.js (pacman) is required for the npm-based servers.
+installed server automatically except `hls` (haskell-tools owns that; Mason's
+HLS bindist is a single GHC patch and fights Stack). Configs come from
+nvim-lspconfig, overrides in `after/lsp/<server>.lua`. ensure-installs
+`lua_ls`, `bashls`, `gopls`, `clangd`, `vtsls`, `html`, `cssls`, `jsonls`.
+Install more via `:Mason` — no config needed. Node.js (pacman) is required
+for the npm-based servers.
 
 lazydev pre-declares every vim.pack plugin as a lua_ls library
 (`bundles/lsp/lazydev.lua`): lua_ls loads the workspace once per session instead
@@ -133,6 +136,21 @@ nvim-lspconfig's defaults at first attach):
 
 Inlay hints are enabled on attach for servers that support them; toggle
 with `<leader>uh`.
+
+Haskell is **not** mason-managed. `haskell-tools.nvim` starts HLS itself
+(install `haskell-language-server-wrapper` via GHCup). The HLS command
+walks to `hie.yaml` / `cabal.project` / `stack.yaml` / `package.yaml`,
+asks the wrapper for that project's GHC, and launches
+`haskell-language-server-<ghc>` with `--cwd` at the project root so
+ghcide matches Stack/Cabal instead of GHCup's default `ghc`. GHCup `set
+hls` only exposes one release on PATH; the cmd also searches
+`~/.ghcup/hls/*/bin/`. You need a bindist for each project GHC (9.10.2
+last shipped in HLS 2.11.0.0: `ghcup install hls 2.11.0.0`). `<leader>hs`
+queries a **local** Hoogle database through Snacks (`hoogle --json`); install
+`hoogle` and run `hoogle generate` once. Buffer maps (haskell/cabal): `<leader>cl`
+code lens, `<leader>ce` eval all snippets, `<leader>hs` Hoogle signature,
+`<leader>hr` / `hf` / `hq` GHCi repl (package / file / quit). `K` opens
+haskell-tools hover actions.
 
 #### Keymaps (buffer-local, on attach)
 

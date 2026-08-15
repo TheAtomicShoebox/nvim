@@ -44,6 +44,7 @@ local expected_plugins = {
   "flash.nvim",
   "trouble.nvim",
   "todo-comments.nvim",
+  "haskell-tools.nvim",
 }
 
 ---External executables the config relies on.
@@ -63,6 +64,10 @@ local expected_tools = {
   { cmd = "vscode-html-language-server", required = false, why = "html", bundle = "lsp" },
   { cmd = "vscode-css-language-server", required = false, why = "cssls", bundle = "lsp" },
   { cmd = "vscode-json-language-server", required = false, why = "jsonls", bundle = "lsp" },
+  { cmd = "haskell-language-server-wrapper", required = false, why = "haskell-tools HLS", bundle = "haskell" },
+  { cmd = "stack", required = false, why = "Stack project GHC for HLS", bundle = "haskell" },
+  { cmd = "cabal", required = false, why = "Cabal project GHC for HLS", bundle = "haskell" },
+  { cmd = "hoogle", required = false, why = "haskell-tools signature search", bundle = "haskell" },
 }
 
 ---Normal-mode keymaps that should exist after startup (leader-based only,
@@ -91,7 +96,7 @@ local expected_maps = {
 local expected_parsers = { "lua", "vim", "vimdoc", "markdown" }
 
 local expected_commands = { "Pack", "PackUpdate", "PackStatus", "PackClean", "PackLock", "PackSync" }
-local expected_bundles = { "ui", "editing", "syntax", "lsp", "completion", "git", "tools" }
+local expected_bundles = { "ui", "editing", "syntax", "lsp", "completion", "git", "tools", "haskell" }
 
 ---Owning bundle for each plugin. If that bundle has not been setup() yet,
 ---a missing/inactive plugin is deferred, not an error.
@@ -132,6 +137,7 @@ local plugin_bundle = {
   ["persistence.nvim"] = "tools",
   ["trouble.nvim"] = "tools",
   ["todo-comments.nvim"] = "tools",
+  ["haskell-tools.nvim"] = "haskell",
 }
 
 ---Owning bundle for each expected keymap. Maps from init.lua have no owner
