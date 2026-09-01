@@ -1,6 +1,6 @@
 local util = require("util")
 
-vim.pack.add({ util.gh('nvim-lualine/lualine.nvim') })
+vim.pack.add({ util.gh("nvim-lualine/lualine.nvim") })
 
 vim.opt.laststatus = 3 -- single global statusline
 
@@ -15,7 +15,11 @@ require("lualine").setup({
     lualine_b = { "branch" },
     lualine_c = {
       { "filetype", icon_only = true, separator = "", padding = { left = 1, right = 0 } },
-      { function() return util.root.pretty_path() end },
+      {
+        function()
+          return util.root.pretty_path()
+        end,
+      },
       {
         "diagnostics",
         symbols = { error = "\u{f057} ", warn = "\u{f071} ", info = "\u{f05a} ", hint = "\u{ea61} " },
@@ -27,11 +31,12 @@ require("lualine").setup({
         -- mini.diff keeps its per-buffer summary here
         source = function()
           local summary = vim.b.minidiff_summary
-          return summary and {
-            added = summary.add,
-            modified = summary.change,
-            removed = summary.delete,
-          }
+          return summary
+            and {
+              added = summary.add,
+              modified = summary.change,
+              removed = summary.delete,
+            }
         end,
       },
     },

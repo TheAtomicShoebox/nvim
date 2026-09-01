@@ -82,10 +82,15 @@ do
   end
 end
 
-vim.keymap.set("n", "<C-j>", "<C-w>j", { desc = "Go to Lower Window", remap = true })
-vim.keymap.set("n", "<C-h>", "<C-w>h", { desc = "Go to Left Window", remap = true })
-vim.keymap.set("n", "<C-k>", "<C-w>k", { desc = "Go to Upper Window", remap = true })
-vim.keymap.set("n", "<C-l>", "<C-w>l", { desc = "Go to Right Window", remap = true })
+-- vim.keymap.set("n", "<C-j>", "<C-w>j", { desc = "Go to Lower Window", remap = true })
+-- vim.keymap.set("n", "<C-h>", "<C-w>h", { desc = "Go to Left Window", remap = true })
+-- vim.keymap.set("n", "<C-k>", "<C-w>k", { desc = "Go to Upper Window", remap = true })
+-- vim.keymap.set("n", "<C-l>", "<C-w>l", { desc = "Go to Right Window", remap = true })
+
+vim.keymap.set({ "n", "t" }, "<C-j>", function() vim.cmd.wincmd("j") end, { desc = "Go to Lower Window" })
+vim.keymap.set({ "n", "t" }, "<C-h>", function() vim.cmd.wincmd("h") end, { desc = "Go to Left Window" })
+vim.keymap.set({ "n", "t" }, "<C-k>", function() vim.cmd.wincmd("k") end, { desc = "Go to Upper Window" })
+vim.keymap.set({ "n", "t" }, "<C-l>", function() vim.cmd.wincmd("l") end, { desc = "Go to Right Window" })
 
 vim.keymap.set("n", "<S-h>", "<cmd>bprevious<cr>", { desc = "Prev Buffer" })
 vim.keymap.set("n", "<S-l>", "<cmd>bnext<cr>", { desc = "Next Buffer" })

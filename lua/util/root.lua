@@ -15,7 +15,7 @@ local M = setmetatable({}, {
 ---@alias RootSpec string|string[]|RootFn
 
 ---@type RootSpec[]
-M.spec = { "lsp", { ".git", "lua" }, "cwd" }
+M.spec = { "lsp", { ".git", "lua", ".sln", ".csproj" }, "cwd" }
 
 M.detectors = {}
 
@@ -121,7 +121,7 @@ function M.detect(opts)
         roots[#roots + 1] = pp
       end
     end
-    table.sort(roots, function(a,b)
+    table.sort(roots, function(a, b)
       return #a > #b
     end)
     if #roots > 0 then
@@ -137,7 +137,7 @@ end
 function M.info()
   local spec = type(vim.g.root_spec) == "table" and vim.g.root_spec or M.spec
 
-  local roots = M.detect({ all = true})
+  local roots = M.detect({ all = true })
   local lines = {} ---@type string[]
   local first = true
   for _, root in ipairs(roots) do
@@ -162,7 +162,7 @@ M.cache = {}
 
 function M.setup()
   vim.api.nvim_create_user_command("Root", function()
-    require('util.root').info()
+    require("util.root").info()
   end, { desc = "Roots for the current buffer" })
 
   -- FIX: doesn't properly clear cache in neo-tree `set_root` (which should happen presumable on `DirChanged`),

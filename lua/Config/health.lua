@@ -45,6 +45,13 @@ local expected_plugins = {
   "trouble.nvim",
   "todo-comments.nvim",
   "haskell-tools.nvim",
+  "easy-dotnet.nvim",
+  "plenary.nvim",
+  "neotest",
+  "nvim-dap",
+  "nvim-dap-ui",
+  "nvim-nio",
+  "nvim-dap-virtual-text",
 }
 
 ---External executables the config relies on.
@@ -68,6 +75,13 @@ local expected_tools = {
   { cmd = "stack", required = false, why = "Stack project GHC for HLS", bundle = "haskell" },
   { cmd = "cabal", required = false, why = "Cabal project GHC for HLS", bundle = "haskell" },
   { cmd = "hoogle", required = false, why = "haskell-tools signature search", bundle = "haskell" },
+  { cmd = "dotnet", required = false, why = ".NET SDK for easy-dotnet", bundle = "dotnet" },
+  {
+    cmd = "dotnet-easydotnet",
+    required = false,
+    why = "EasyDotnet server (`dotnet tool install -g EasyDotnet`)",
+    bundle = "dotnet",
+  },
 }
 
 ---Normal-mode keymaps that should exist after startup (leader-based only,
@@ -90,13 +104,17 @@ local expected_maps = {
   "]t",
   "<leader>st",
   "<leader>p",
+  "<leader>Nb",
+  "<leader>db",
+  "<leader>tr",
 }
 
 ---Treesitter parsers that bundles/syntax/treesitter.lua ensures.
 local expected_parsers = { "lua", "vim", "vimdoc", "markdown" }
 
 local expected_commands = { "Pack", "PackUpdate", "PackStatus", "PackClean", "PackLock", "PackSync" }
-local expected_bundles = { "ui", "editing", "syntax", "lsp", "completion", "git", "tools", "haskell" }
+local expected_bundles =
+  { "ui", "editing", "syntax", "lsp", "completion", "git", "tools", "debug", "test", "haskell", "dotnet" }
 
 ---Owning bundle for each plugin. If that bundle has not been setup() yet,
 ---a missing/inactive plugin is deferred, not an error.
@@ -138,6 +156,13 @@ local plugin_bundle = {
   ["trouble.nvim"] = "tools",
   ["todo-comments.nvim"] = "tools",
   ["haskell-tools.nvim"] = "haskell",
+  ["easy-dotnet.nvim"] = "dotnet",
+  ["plenary.nvim"] = "dotnet",
+  ["neotest"] = "test",
+  ["nvim-dap"] = "debug",
+  ["nvim-dap-ui"] = "debug",
+  ["nvim-nio"] = "debug",
+  ["nvim-dap-virtual-text"] = "debug",
 }
 
 ---Owning bundle for each expected keymap. Maps from init.lua have no owner
@@ -159,6 +184,9 @@ local map_bundle = {
   ["]t"] = "tools",
   ["<leader>st"] = "tools",
   ["<leader>p"] = "tools",
+  ["<leader>Nb"] = "dotnet",
+  ["<leader>db"] = "debug",
+  ["<leader>tr"] = "test",
 }
 
 ---@param load Bundle.Load
@@ -275,9 +303,7 @@ local function check_globals()
   else
     health.error("`Snacks` global is missing: snacks setup did not run")
   end
-  local ok, root = pcall(function()
-    return require("util").root()
-  end)
+  local ok, root = pcall(function() return require("util").root() end)
   if ok and type(root) == "string" then
     health.ok(("`util.root()` works (current: %s)"):format(root))
   else
@@ -308,7 +334,9 @@ local function check_treesitter(by_name)
     if vim.tbl_contains(installed, parser) then
       health.ok(("`%s` parser installed"):format(parser))
     else
-      health.warn(("`%s` parser missing (bundles/syntax/treesitter.lua should install it on next start)"):format(parser))
+      health.warn(
+        ("`%s` parser missing (bundles/syntax/treesitter.lua should install it on next start)"):format(parser)
+      )
     end
   end
 end

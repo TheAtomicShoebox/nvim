@@ -1,7 +1,7 @@
 local util = require("util")
 
 vim.pack.add({
-  util.gh('folke/which-key.nvim'),
+  util.gh("folke/which-key.nvim"),
 })
 
 require("which-key").setup({
@@ -16,7 +16,9 @@ require("which-key").setup({
       { "<leader>f", group = "file/find" },
       { "<leader>g", group = "git" },
       { "<leader>h", group = "haskell" },
+      { "<leader>N", group = "dotnet" },
       { "<leader>p", group = "pack" },
+      { "<leader>t", group = "test" },
       { "<leader>gh", group = "hunks" },
       { "<leader>q", group = "quit/session" },
       { "<leader>s", group = "search" },

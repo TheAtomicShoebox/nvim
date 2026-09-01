@@ -7,7 +7,25 @@ vim.pack.add({
   gh("akinsho/bufferline.nvim"),
 })
 
-require("mini.icons").setup({})
+-- Custom .NET project filetypes are not in mini.icons defaults. User
+-- entries must be { glyph, hl } tables: a string alias is ignored and
+-- the generic file icon gets cached instead.
+require("mini.icons").setup({
+  extension = {
+    csproj = { glyph = "󰪮", hl = "MiniIconsPurple" }, -- nf-md-dot_net
+    fsproj = { glyph = "󰪮", hl = "MiniIconsBlue" },
+    sln = { glyph = "", hl = "MiniIconsPurple" }, -- nf-dev-visualstudio
+    slnx = { glyph = "", hl = "MiniIconsPurple" },
+    props = { glyph = "󰗀", hl = "MiniIconsOrange" },
+    targets = { glyph = "󰗀", hl = "MiniIconsOrange" },
+  },
+  filetype = {
+    csproj = { glyph = "󰪮", hl = "MiniIconsPurple" },
+    fsproj = { glyph = "󰪮", hl = "MiniIconsBlue" },
+    props = { glyph = "󰗀", hl = "MiniIconsOrange" },
+    targets = { glyph = "󰗀", hl = "MiniIconsOrange" },
+  },
+})
 -- Let plugins that expect nvim-web-devicons (bufferline below, lualine at
 -- render time) use mini.icons. Must run before bufferline.setup().
 require("mini.icons").mock_nvim_web_devicons()
@@ -39,6 +57,12 @@ require("bufferline").setup({
       {
         filetype = "snacks_picker_list",
         text = "Explorer",
+        highlight = "Directory",
+        text_align = "left",
+      },
+      {
+        filetype = "neotest-summary",
+        text = "Tests",
         highlight = "Directory",
         text_align = "left",
       },

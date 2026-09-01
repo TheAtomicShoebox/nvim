@@ -8,12 +8,12 @@ util.pack.build("nvim-treesitter", ":TSUpdate")
 
 vim.pack.add({
   {
-    src = gh('nvim-treesitter/nvim-treesitter'),
-    version = 'main',
+    src = gh("nvim-treesitter/nvim-treesitter"),
+    version = "main",
   },
 })
 
-local treesitter = require('nvim-treesitter')
+local treesitter = require("nvim-treesitter")
 treesitter.setup({})
 
 local ensure_installed = {
@@ -34,10 +34,13 @@ local ensure_installed = {
   "vue",
   "svelte",
   "bash",
-  "haskell"
+  "haskell",
+  "c_sharp",
+  "xml",
+  "sql",
 }
 
-local config = require('nvim-treesitter.config')
+local config = require("nvim-treesitter.config")
 
 local already_installed = config.get_installed()
 local parsers_to_install = {}
@@ -52,7 +55,7 @@ if #parsers_to_install > 0 then
   treesitter.install(parsers_to_install)
 end
 
-local group = vim.api.nvim_create_augroup('TreeSitterConfig', { clear = true })
+local group = vim.api.nvim_create_augroup("TreeSitterConfig", { clear = true })
 vim.api.nvim_create_autocmd("FileType", {
   group = group,
   callback = function(args)

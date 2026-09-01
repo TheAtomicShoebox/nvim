@@ -24,8 +24,12 @@ require("mason-lspconfig").setup({
   -- Mason's HLS bindist is GHC-patch-specific (currently 9.10.3) and
   -- automatic_enable would start lspconfig's `hls` next to haskell-tools,
   -- which is what produces "ghcide compiled against X but using Y".
+  -- EasyDotnet owns C# (builtin Roslyn); a Mason omnisharp/csharp_ls
+  -- install must not start a second client.
   automatic_enable = {
-    exclude = { "hls" },
+    exclude = { "hls", "omnisharp", "csharp_ls" },
   },
 })
 vim.lsp.enable("hls", false)
+vim.lsp.enable("omnisharp", false)
+vim.lsp.enable("csharp_ls", false)
