@@ -3,9 +3,7 @@ local M = {
   load = { event = "VimEnter", once = true },
 }
 
-function M.deps()
-  return { require("bundles.ui") }
-end
+function M.deps() return { require("bundles.ui") } end
 
 function M.setup()
   require("bundles.git.mini-git")

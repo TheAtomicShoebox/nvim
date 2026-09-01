@@ -6,13 +6,12 @@ local M = {
   load = { event = "VimEnter", once = true },
 }
 
-function M.deps()
-  return {}
-end
+function M.deps() return { require("bundles.ui") } end
 
 function M.setup()
   require("bundles.editing.mini")
   require("bundles.editing.flash")
+  require("bundles.editing.yanky")
 end
 
 return M

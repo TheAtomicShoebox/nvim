@@ -18,6 +18,7 @@ require("which-key").setup({
       { "<leader>h", group = "haskell" },
       { "<leader>N", group = "dotnet" },
       { "<leader>p", group = "pack" },
+      { "<leader>y", group = "yank/paste" },
       { "<leader>t", group = "test" },
       { "<leader>gh", group = "hunks" },
       { "<leader>q", group = "quit/session" },

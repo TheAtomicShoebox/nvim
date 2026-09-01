@@ -32,7 +32,7 @@ Bundles:
 | Bundle | Load | Depends on | What it sets up |
 |---|---|---|---|
 | `ui` | eager | — | colorschemes, snacks, noice, which-key, bufferline, lualine, mini.icons |
-| `editing` | VimEnter | — | mini modules, flash |
+| `editing` | VimEnter | ui | mini modules, flash, yanky |
 | `syntax` | FileType | — | nvim-treesitter |
 | `completion` | InsertEnter (also pulled by `lsp`) | — | blink.cmp, LuaSnip |
 | `lsp` | FileType | completion | mason, lspconfig, lazydev, conform |
@@ -118,6 +118,7 @@ External tools (`:checkhealth Config`):
 | `<leader>:` | Command history |
 | `<leader>sk` / `sr` / `su` | Keymaps / resume picker / undo tree |
 | `<leader>p` | vim.pack operations (also `pu`/`ps`/`pc`/`pl`/`pS`) |
+| `<leader>yy` | Yank history (snacks picker) |
 | `<leader>e` / `fe` | Explorer (root) |
 | `<leader>E` / `fE` | Explorer (cwd) |
 
@@ -329,6 +330,30 @@ treesitter nodes; in operator-pending mode `r` does a remote action (e.g.
 toggles flash during `/` search. Normal `r`/`s`-substitute semantics: `r`
 replace-char is untouched (flash only claims it after an operator), and `s`
 (synonym for `cl`) is taken over — use `cl` if you ever need it.
+
+### Yank history (yanky.nvim)
+
+`y` / `p` / `P` / `gp` / `gP` go through yanky so every yank lands in a
+ring. After a put, `<C-p>` / `<C-n>` (also `[y` / `]y`) cycle older or
+newer entries in place. Cursor stays put after yank; a 500ms highlight
+flashes the yanked or put range. Carriage returns are stripped on put
+(Windows/WSL clipboard).
+
+`<leader>y` is the yank/paste group (which-key). `<leader>yy` opens the
+ring in a snacks picker.
+
+| Key | Action |
+|---|---|
+| `y` / `p` / `P` | Yank / put after / put before |
+| `gp` / `gP` | Put after / before, cursor after the text |
+| `<C-p>` / `<C-n>` | Previous / next ring entry after a put |
+| `[y` / `]y` | Cycle yank history forward / backward |
+| `]p` / `[p` / `]P` / `[P` | Put indented, linewise (after / before) |
+| `>p` / `<p` / `>P` / `<P` | Put and indent right / left |
+| `=p` / `=P` | Put after / before applying a filter |
+| `<leader>yy` | Open yank history (snacks picker) |
+| `<leader>yc` | Clear yank history |
+| `<leader>yn` / `yN` | Cycle yank history forward / backward |
 
 ### Editing (mini.nvim, defaults unless noted)
 

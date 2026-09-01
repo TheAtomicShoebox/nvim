@@ -30,6 +30,8 @@ vim.opt.signcolumn = "yes"
 vim.opt.showmatch = true
 vim.opt.showmode = false
 
+vim.opt.clipboard = "unnamedplus"
+
 vim.keymap.set("n", "<ESC>", ":nohlsearch<CR>", { desc = "Clear search highlights" })
 
 -- Format-on-save is handled by conform.nvim (bundles/lsp/conform.lua).
@@ -37,9 +39,7 @@ vim.keymap.set("n", "<ESC>", ":nohlsearch<CR>", { desc = "Clear search highlight
 -- Re-apply after colorscheme so the transparent sign column survives theme load.
 vim.api.nvim_create_autocmd("ColorScheme", {
   group = vim.api.nvim_create_augroup("UserSignColumn", { clear = true }),
-  callback = function()
-    vim.api.nvim_set_hl(0, "SignColumn", { bg = "none" })
-  end,
+  callback = function() vim.api.nvim_set_hl(0, "SignColumn", { bg = "none" }) end,
 })
 vim.api.nvim_set_hl(0, "SignColumn", { bg = "none" })
 

@@ -70,9 +70,7 @@ local pool = {
 
 local function announce(name)
   vim.g.user_colorscheme = name
-  vim.schedule(function()
-    vim.notify("Colorscheme: " .. name, vim.log.levels.INFO, { title = "Colorscheme" })
-  end)
+  vim.schedule(function() vim.notify("Colorscheme: " .. name, vim.log.levels.INFO, { title = "Colorscheme" }) end)
 end
 
 ---@param choice ColorChoice
@@ -85,10 +83,7 @@ local function apply_choice(choice)
     ok, err = pcall(vim.cmd.colorscheme, choice.name)
   end
   if not ok then
-    vim.notify(
-      ("Failed to load %s (%s); falling back to %s"):format(choice.name, err, M.default),
-      vim.log.levels.WARN
-    )
+    vim.notify(("Failed to load %s (%s); falling back to %s"):format(choice.name, err, M.default), vim.log.levels.WARN)
     pcall(vim.cmd.colorscheme, M.default)
     announce(M.default)
     return
@@ -144,30 +139,14 @@ vim.pack.add({
   gh("bluz71/vim-moonfly-colors"),
 })
 
-pcall(function()
-  require("tokyonight").setup({ style = "moon" })
-end)
-pcall(function()
-  require("catppuccin").setup({})
-end)
-pcall(function()
-  require("kanagawa").setup({})
-end)
-pcall(function()
-  require("rose-pine").setup({})
-end)
-pcall(function()
-  require("nightfox").setup({})
-end)
-pcall(function()
-  require("github-theme").setup({})
-end)
-pcall(function()
-  require("cyberdream").setup({ variant = "default" })
-end)
-pcall(function()
-  require("nordic").setup({})
-end)
+pcall(function() require("tokyonight").setup({ style = "moon" }) end)
+pcall(function() require("catppuccin").setup({}) end)
+pcall(function() require("kanagawa").setup({}) end)
+pcall(function() require("rose-pine").setup({}) end)
+pcall(function() require("nightfox").setup({}) end)
+pcall(function() require("github-theme").setup({}) end)
+pcall(function() require("cyberdream").setup({ variant = "default" }) end)
+pcall(function() require("nordic").setup({}) end)
 
 vim.g.gruvbox_material_background = "medium"
 vim.g.gruvbox_material_foreground = "material"
@@ -176,8 +155,6 @@ vim.g.everforest_background = "medium"
 math.randomseed(tonumber(vim.uv.hrtime() % 2 ^ 31) or os.time())
 M.roll()
 
-vim.keymap.set("n", "<leader>uR", function()
-  M.roll()
-end, { desc = "Random Colorscheme" })
+vim.keymap.set("n", "<leader>uR", function() M.roll() end, { desc = "Random Colorscheme" })
 
 return M

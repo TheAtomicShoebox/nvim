@@ -5,7 +5,7 @@
 local gh = require("util").gh
 
 vim.pack.add({
-  gh('nvim-mini/mini.nvim'),
+  gh("nvim-mini/mini.nvim"),
 })
 
 require("mini.ai").setup({})
