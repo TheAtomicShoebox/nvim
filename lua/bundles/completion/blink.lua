@@ -11,14 +11,17 @@ local blink_cmp = require("blink.cmp")
 -- blink's rust fuzzy matcher needs a build step before setup
 blink_cmp.build():pwait()
 blink_cmp.setup({
-  keymap = {
-    preset = "default",
-    -- "<C-Space>"] = { "show", "hide" },
-    -- ["<CR>"] = { "accept", "fallback" },
-    -- ["<C-j>"] = { "select_next", "fallback" },
-    -- ["<C-k>"] = { "select_prev", "fallback" },
-    -- ["<Tab>"] = { "snippet_forward", "fallback" },
-    -- ["<S-Tab>"] = { "snippet_backward", "fallback" },
+  keymap = { preset = "super-tab" },
+  -- Don't preselect while a snippet can still jump forward, so Tab
+  -- advances placeholders instead of accepting a new completion.
+  completion = {
+    list = {
+      selection = {
+        preselect = function()
+          return not blink_cmp.snippet_active({ direction = 1 })
+        end,
+      },
+    },
   },
   appearance = { nerd_font_variant = "mono" },
   sources = {
